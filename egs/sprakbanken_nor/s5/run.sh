@@ -30,7 +30,7 @@ mfccdir=mfcctest
 # Will return a warning message because of the corrupt audio files, but compute them anyway
 # If this step fails and prints a partial diff, rerun from sprak_data_prep.sh
 
-steps/make_mfcc.sh --nj 10 --cmd $train_cmd data/test exp/make_mfcc/test test mfcc || exit 1;
+steps/make_mfcc.sh --nj 10 --cmd $train_cmd data/test exp/make_mfcc/test mfcc || exit 1;
 steps/make_mfcc.sh --nj 10 --cmd $train_cmd data/train exp/make_mfcc/train mfcc || exit 1;
 
 
