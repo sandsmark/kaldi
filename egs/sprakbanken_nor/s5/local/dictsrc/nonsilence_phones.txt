@@ -1,55 +1,311 @@
-2:	"2:	%2:
-9	"9	%9
+""2:
+""9
+""9Y
+""A
+""A:
+""AI
+""C
+""E
+""Eu0
+""I
+""O
+""OY
+""S
+""U
+""Y
+""b
+""d
+""dZ
+""d`
+""e:
+""eI
+""f
+""g
+""h
+""i:
+""j
+""k
+""l
+""l`
+""m
+""n
+""n`
+""o:
+""p
+""r
+""r3
+""s
+""s`
+""t
+""tS
+""t`
+""u0
+""u:
+""v
+""y:
+""{
+""{:
+""{I
+""}:
+"2:
+"3:
+"9
+"9Y
+"@U
+"A
+"A:
+"AI
+"C
+"E
+"E*U
+"E:
+"Eu0
+"I
+"N
+"O
+"OY
+"S
+"T
+"U
+"V
+"Y
+"Z
+"a
+"a*U
+"a:
+"aI
+"aU
+"a~
+"b
+"d
+"dZ
+"d`
+"e
+"e:
+"eI
+"f
+"g
+"h
+"i:
+"j
+"k
+"l
+"l`
+"m
+"n
+"n=
+"n`
+"n`=
+"o:
+"p
+"r
+"r3
+"s
+"s'
+"s`
+"t
+"tS
+"t`
+"u0
+"u:
+"v
+"w
+"y:
+"z
+"{
+"{:
+"{I
+"}:
+$
+%"2:
+%"9
+%"9Y
+%"A
+%"A:
+%"C
+%"E
+%"Eu0
+%"I
+%"O
+%"S
+%"U
+%"b
+%"d
+%"e:
+%"f
+%"g
+%"h
+%"i:
+%"j
+%"k
+%"l
+%"l`
+%"m
+%"n
+%"o:
+%"p
+%"r
+%"s
+%"t
+%"t`
+%"u0
+%"u:
+%"v
+%"{:
+%"{I
+%2:
+%9
+%9Y
+%@U
+%A
+%A:
+%AI
+%C
+%E
+%E:
+%Eu0
+%I
+%O
+%OY
+%S
+%T
+%U
+%Y
+%Z
+%a
+%a*U
+%aI
+%aU
+%b
+%d
+%dZ
+%d`
+%e
+%e:
+%e~
+%f
+%g
+%h
+%i:
+%j
+%k
+%l
+%l`
+%m
+%n
+%n`
+%o:
+%p
+%r
+%r3
+%s
+%s'
+%s`
+%t
+%tS
+%t`
+%u0
+%u:
+%v
+%w
+%y:
+%z
+%{
+%{:
+%{I
+%}:
+'a*
+-
+2:
+3:
+9
+9Y
 @
+@"U
+@U
 A
-A:	"A:	%A:
-E	"E	%E
-E*U	"E*U
-E:	"E:	%E:
-I	"I	%I
+A:
+AI
+C
+D
+E
+E*U
+E:
+Eu0
+I
+I@
 N
-O	"O	%O 
+O
+OY
 R
-S	"S	%S
-U	"U	%U
+S
+T
+U
+U4
+U:
+V
 W
-Y	"Y	%Y
-a	"a	%a
-a*	'a*
-a*U	"a*U	%a*U
+Y
+Z
+a
+a*
+a*U
+a:
 aI
-b	"b	%b
-d	"d	%d
+aU
+a~
+b
+d
 dZ
-d`	"d`	%d`
-e	"e	%e
-e:	"e:	%e:
-f	"f	%f
-g	"g	%g
-h	"h	%h
+d`
+e
+e:
+eI
+e~
+f
+g
+h
 i
-i:	"i:	%i:
-j	"j	%j	%"j
-k	"k	%k
-l	"l	%l
-l`	"l`	%l`
-m	"m	%m
-n	"n	%n	
-n`	"n`	%n`
+i:
+j
+k
+l
+l=
+l`
+l`=
+m
+n
+n=
+n=$
+n`
+n`=
 o
-o:	"o:	%o:
-p	"p	%p
-r	"r	%r
-s	"s	%s
-s'	"s'	%s'
-s`	"s`	%s`
-t	"t	%t
-t`	"t`	%t`	
+o:
+o~
+p
+r
+r3
+s
+s'
+s`
+si$
+sil
+t
+t$
+tS
+t`
+t`$
 u
-u0	"u0	%u0
-u:	"u:	%u:
-v	"v	%v	
+u0
+u:
+v
 w
+x
 y
-y:	"y:	%y:
-}:	"}:	%}:
+y:
+z
+{
+{%
+{:
+{I
+}:
