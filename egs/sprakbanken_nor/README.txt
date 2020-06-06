@@ -17,7 +17,8 @@ of recordings with different dialects was selected primarily by linguistic
 considerations and secondarily statistical and socio-economic conditions.
 
 
-This recipe is based on the Danish and Swedish recipies.
+This recipe is based on the Danish and Swedish recipies. In total you will need
+approximately 210GB of free space to download and extract all the data.
 
 
 Origin of the data:

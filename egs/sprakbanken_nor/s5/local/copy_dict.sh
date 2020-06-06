@@ -32,11 +32,16 @@ cp local/dictsrc/nonsilence_phones.txt $dir/nonsilence_phones.txt
 cp local/dictsrc/extra_questions.txt $dir/extra_questions.txt
 cp local/dictsrc/silence_phones.txt $dir/silence_phones.txt
 cp local/dictsrc/optional_silence.txt $dir/optional_silence.txt
-
+cp local/dictsrc/lexicon.txt $dir/lexicon.txt
 
 # Copy pre-made lexicon
-wget http://www.openslr.org/resources/29/lexicon-sv.tgz --directory-prefix=data/local/data/download
-tar -xzf data/local/data/download/lexicon-sv.tgz -C $dir
+#wget https://www.nb.no/sbfil/leksikalske_databaser/leksikon/no.leksikon.tar.gz --directory-prefix=data/local/data/download
+#if [ ! -f "data/local/data/download/20191016_nlb_trans.tar.gz" ]; then
+#    wget https://www.nb.no/sbfil/leksikalske_databaser/20191016_nlb_trans.tar.gz --directory-prefix=data/local/data/download
+#fi
+#mkdir -p data/local/data/dict
+#tar -xzf data/local/data/download/20191016_nlb_trans.tar.gz -C data/local/data/dict
+#cat data/local/data/dict/20191016_nlb_trans/*.lex | cut -f-2 >> "$dir"/lexicon.txt
 
 
 
