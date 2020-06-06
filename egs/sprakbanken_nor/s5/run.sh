@@ -14,7 +14,7 @@ local/sprak_data_prep.sh  || exit 1;
 utils/fix_data_dir.sh data/train || exit 1;
 
 # Perform text normalisation, prepare dict folder and LM data transcriptions
-local/copy_dict || exit 1;
+local/copy_dict.sh || exit 1;
 
 utils/prepare_lang.sh data/local/dict "<UNK>" data/local/lang_tmp data/lang || exit 1;
 
