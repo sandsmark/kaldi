@@ -10,7 +10,7 @@ dir=`pwd`/data/local/data
 lmdir=`pwd`/data/local/transcript_lm
 traindir=`pwd`/data/local/trainsrc
 testdir=`pwd`/data/local/testsrc
-rm -rf $lmdir $traindir $testdir $devdir
+rm -r $lmdir $traindir $testdir $devdir
 mkdir -p $dir $lmdir $traindir $testdir $devdir
 local=`pwd`/local
 utils=`pwd`/utils
@@ -27,27 +27,29 @@ utils=`pwd`/utils
 #  echo "sudo apt-get install python3" || exit 1;
 #fi
 
-if [ ! -d $dir/download ]; then
-    mkdir -p $dir/download/0467-1 $dir/download/0467-2 $dir/download/0467-3
-fi 
-
 echo "Downloading and unpacking sprakbanken to $dir/corpus_processed. This will take a while."
 
-if [ ! -f $dir/download/sve.16khz.0467-1.tar.gz ]; then 
-    ( wget --tries 100 http://www.nb.no/sbfil/talegjenkjenning/16kHz/sve.16khz.0467-1.tar.gz --directory-prefix=$dir/download )
-fi
+for PACKAGE in 0463-{1,2,3,4} 0464-testing; do
+    EXTRACT_DIR="$dir/download/$PACKAGE"
+    if [ "$(ls -A "$EXTRACT_DIR")" ]; then
+        continue
+    fi
 
-if [ ! -f $dir/download/sve.16khz.0467-2.tar.gz ]; then 
-    ( wget --tries 100 http://www.nb.no/sbfil/talegjenkjenning/16kHz/sve.16khz.0467-2.tar.gz --directory-prefix=$dir/download )
-fi
+    if [ ! -d "$EXTRACT_DIR" ]; then
+        mkdir -p "$dir/download/$PACKAGE"
+    fi
 
-if [ ! -f $dir/download/sve.16khz.0467-3.tar.gz ]; then 
-    ( wget --tries 100 http://www.nb.no/sbfil/talegjenkjenning/16kHz/sve.16khz.0467-3.tar.gz --directory-prefix=$dir/download )
-fi
+    FILENAME="no.16khz.$PACKAGE.tar.gz"
+    if [ ! -f "$dir/download/"$FILENAME ]; then
+        ( echo wget --tries 100 "https://www.nb.no/sbfil/talegjenkjenning/16kHz/$FILENAME" --directory-prefix=$dir/download )
+    fi
 
-if [ ! -f $dir/download/sve.16khz.0467-1.tar.gz ]; then 
-    ( wget --tries 100 http://www.nb.no/sbfil/talegjenkjenning/16kHz/sve.16khz.0468.tar.gz --directory-prefix=$dir/download )
-fi    
+    if [ "$(command -v pigz)" -a "$(command -v pv)" ]; then
+        pv "$dir/download/$FILENAME" | pigz -dc - | tar xf - -C "$EXTRACT_DIR"
+    else
+        tar -xzf $dir/download/"$FILENAME" -C "$EXTRACT_DIR"
+    fi
+done
 
 echo "Corpus files downloaded."
 
