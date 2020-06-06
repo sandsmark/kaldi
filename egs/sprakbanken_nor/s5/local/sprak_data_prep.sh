@@ -5,6 +5,7 @@
 # Copyright 2016 KTH Royal Institute of Technology (Author: Emelie Kullmann)
 # Apache 2.0.
 
+set -e
 
 dir=`pwd`/data/local/data
 lmdir=`pwd`/data/local/transcript_lm
@@ -15,54 +16,9 @@ mkdir -p $dir $lmdir $traindir $testdir $devdir
 local=`pwd`/local
 utils=`pwd`/utils
 
+echo "$dir"
 
 . ./path.sh
-
-# Checks if python3 is available on the system and install python3 in userspace if not
-# This recipe currently relies on version 3 because python3 uses utf8 as internal 
-# string representation
-
-#if ! which python3 >&/dev/null; then
-#  echo "Python3 is not installed, to install it you should probably do:"
-#  echo "sudo apt-get install python3" || exit 1;
-#fi
-
-echo "Downloading and unpacking sprakbanken to $dir/corpus_processed. This will take a while."
-
-for PACKAGE in 0463-{1,2,3,4} 0464-testing; do
-    EXTRACT_DIR="$dir/download/$PACKAGE"
-    if [ "$(ls -A "$EXTRACT_DIR")" ]; then
-        continue
-    fi
-
-    if [ ! -d "$EXTRACT_DIR" ]; then
-        mkdir -p "$dir/download/$PACKAGE"
-    fi
-
-    FILENAME="no.16khz.$PACKAGE.tar.gz"
-    if [ ! -f "$dir/download/"$FILENAME ]; then
-        ( echo wget --tries 100 "https://www.nb.no/sbfil/talegjenkjenning/16kHz/$FILENAME" --directory-prefix=$dir/download )
-    fi
-
-    if [ "$(command -v pigz)" -a "$(command -v pv)" ]; then
-        pv "$dir/download/$FILENAME" | pigz -dc - | tar xf - -C "$EXTRACT_DIR"
-    else
-        tar -xzf $dir/download/"$FILENAME" -C "$EXTRACT_DIR"
-    fi
-done
-
-echo "Corpus files downloaded."
-
-if [ ! -d $dir/download/0468 ]; then
-    echo "Unpacking files."
-    tar -xzf $dir/download/sve.16khz.0467-1.tar.gz -C $dir/download/0467-1
-    tar -xzf $dir/download/sve.16khz.0467-2.tar.gz -C $dir/download/0467-2
-    tar -xzf $dir/download/sve.16khz.0467-3.tar.gz -C $dir/download/0467-3
-    tar -xzf $dir/download/sve.16khz.0468.tar.gz -C $dir/download/0468    
-
-     
-    echo "Corpus unpacked succesfully."
-fi
 
 sph2pipe=$(which sph2pipe) || sph2pipe=$KALDI_ROOT/tools/sph2pipe_v2.5/sph2pipe
 if [ ! -x $sph2pipe ]; then
@@ -70,65 +26,77 @@ if [ ! -x $sph2pipe ]; then
    exit 1;
 fi
 
+echo "Downloading, unpacking and processing corpus to $dir/corpus_processed. This will take a while."
+
+rm -f "$lmdir/lmsents" "$dir/traintxtfiles" "$dir/trainsndfiles" "$lmdir/transcripts.uniq" "$lmdir/lmsents.norm"
+
+for PACKAGE in 0463-{1,2,3,4} 0464-testing; do
+    EXTRACT_DIR="$dir/download/$PACKAGE"
+    if [ ! "$(ls -A "$EXTRACT_DIR")" ]; then
+
+        if [ ! -d "$EXTRACT_DIR" ]; then
+            mkdir -p "$dir/download/$PACKAGE"
+        fi
+
+        FILENAME="no.16khz.$PACKAGE.tar.gz"
+        if [ ! -f "$dir/download/"$FILENAME ]; then
+            ( echo wget --tries 100 "https://www.nb.no/sbfil/talegjenkjenning/16kHz/$FILENAME" --directory-prefix=$dir/download )
+        fi
+
+        if [ "$(command -v pigz)" -a "$(command -v pv)" ]; then
+            pv "$dir/download/$FILENAME" | pigz -dc - | tar xf - -C "$EXTRACT_DIR"
+        else
+            tar -xzf $dir/download/"$FILENAME" -C "$EXTRACT_DIR"
+        fi
+    fi
+
+    PROCESSED_DIR="$dir/corpus_processed/training/$PACKAGE"
+    echo "Checking testing"
+    if [[ $PACKAGE == *"testing"* ]]; then
+        PROCESSED_DIR="$dir/corpus_processed/testing/$PACKAGE"
+    fi
+    echo "Processing $PACKAGE to $PROCESSED_DIR"
+    echo "Checking exists"
+    if [ ! -d "$PROCESSED_DIR" ]; then
+        echo "Running python"
+        mkdir -p "$PROCESSED_DIR"
+        python "$local/sprak2kaldi.py" "$EXTRACT_DIR" "$PROCESSED_DIR"
+    fi
+    echo "CReating data"
+
+    # Creating testing and training data
+    if [[ $PACKAGE == *"testing"* ]]; then
+        echo "============= testing dir ============="
+        cat "$PROCESSED_DIR/txtlist" >> "$dir/testtxtfiles"
+        cat "$PROCESSED_DIR/sndlist" >> "$dir/testsndfiles"
+    else
+        cat "$PROCESSED_DIR/txtlist" | while read l; do cat $l; done >> "$lmdir/lmsents"
+        cat "$PROCESSED_DIR/txtlist" >> "$dir/traintxtfiles"
+        cat "$PROCESSED_DIR/sndlist" >> "$dir/trainsndfiles"
+    fi
+done
+
+echo "Corpus files downloaded."
+
 echo "done"
 
 echo "Converting downloaded files to a format consumable by Kaldi scripts."
 
-rm -rf $dir/corpus_processed 
-mkdir -p $dir/corpus_processed/training/0467-1 $dir/corpus_processed/training/0467-2 $dir/corpus_processed/training/0467-3 
-
-# Create parallel file lists and text files, but keep sound files in the same location to save disk space
-# Writes the lists to data/local/data (~ 310h)
-echo "Creating parallel data for training data."
-python $local/sprak2kaldi.py $dir/download/0467-1 $dir/corpus_processed/training/0467-1  # ~140h
-python $local/sprak2kaldi.py $dir/download/0467-2 $dir/corpus_processed/training/0467-2  # ~125h
-python $local/sprak2kaldi.py $dir/download/0467-3 $dir/corpus_processed/training/0467-3  # ~128h
-
-mv $dir/corpus_processed/training/0467-1/'r4670118.791213 8232' $dir/corpus_processed/training/0467-1/'r4670118.791213_8232'
-for f in $dir/corpus_processed/training/0467-1/r4670118.791213_8232/*.txt; do
-    mv "$f" "${f// /_}";
-done
-
-(
-# Ditto test set (~ 93h)
-    echo "Creating parallel data for test data."
-    rm -rf $dir/corpus_processed/test/0468 
-    mkdir -p $dir/corpus_processed/test/0468 
-    python $local/sprak2kaldi.py $dir/download/0468 $dir/corpus_processed/test/0468
-) 
-
-
-# Create the LM training data 
-(
-    echo "Writing the LM text to file and normalising."
-    cat $dir/corpus_processed/training/0467-1/txtlist $dir/corpus_processed/training/0467-2/txtlist $dir/corpus_processed/training/0467-3/txtlist | while read l; do cat $l; done > $lmdir/lmsents
-    python local/normalize_transcript.py $lmdir/lmsents $lmdir/lmsents.norm
-    sort -u $lmdir/lmsents.norm > $lmdir/transcripts.uniq
-)
-
-# Combine training file lists
-echo "Combine file lists."
-cat $dir/corpus_processed/training/0467-1/txtlist $dir/corpus_processed/training/0467-2/txtlist $dir/corpus_processed/training/0467-3/txtlist > $dir/traintxtfiles
-cat $dir/corpus_processed/training/0467-1/sndlist $dir/corpus_processed/training/0467-2/sndlist $dir/corpus_processed/training/0467-3/sndlist > $dir/trainsndfiles
-
-
-# Move test file lists to the right location
-cp $dir/corpus_processed/test/0468/txtlist $dir/testtxtfiles
-cp $dir/corpus_processed/test/0468/sndlist $dir/testsndfiles
+python "$local/normalize_transcript.py" "$lmdir/lmsents" "$lmdir/lmsents.norm"
+sort -u "$lmdir/lmsents.norm" > "$lmdir/transcripts.uniq"
 
 # Write wav.scp, utt2spk and text.unnormalised for train, test and dev sets with
 # Use sph2pipe because the wav files are actually sph files
-echo "Creating wav.scp, utt2spk and text.unnormalised for train, test and dev" 
-python3 $local/data_prep.py $dir/traintxtfiles $traindir $dir/trainsndfiles $sph2pipe
-python3 $local/data_prep.py $dir/testtxtfiles $testdir $dir/testsndfiles $sph2pipe
-
-
+echo "Creating wav.scp, utt2spk and text.unnormalised for train" 
+python3 "$local/data_prep.py" "$dir/traintxtfiles" "$traindir" "$dir/trainsndfiles" "$sph2pipe"
+echo "Creating wav.scp, utt2spk and text.unnormalised for test" 
+python3 "$local/data_prep.py" "$dir/testtxtfiles" "$testdir" "$dir/testsndfiles" "$sph2pipe"
 
 # Create the main data sets
-local/create_datasets.sh $testdir data/test 
-local/create_datasets.sh $traindir data/train 
-
-
+echo "Creating main data set for test"
+"$local/create_datasets.sh" "$testdir" data/test 
+echo "Creating main data set for train"
+"$local/create_datasets.sh" "$traindir" data/train 
 
 
 echo "Data preparation succeeded"
