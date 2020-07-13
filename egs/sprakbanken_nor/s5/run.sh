@@ -65,7 +65,7 @@ utils/mkgraph.sh data/lang_test_4g exp/mono exp/mono/graph_4g || exit 1;
 # Ensure that all graphs are constructed
 
 
-steps/decode.sh --config conf/decode.config --nj 10 --cmd "$decode_cmd" \
+steps/decode.sh --config conf/decode_dnn.config --nj 10 --cmd "$decode_cmd" \
   exp/mono/graph_4g data/test120_p_spk exp/mono/decode || exit 1;
 
 # Get alignments from monophone system.
@@ -82,7 +82,7 @@ steps/train_deltas.sh --cmd "$train_cmd" \
 #make graph
 utils/mkgraph.sh data/lang_test_4g exp/tri1 exp/tri1/graph_4g || exit 1;
 
-steps/decode.sh --config conf/decode.config --nj 10 --cmd "$decode_cmd" \
+steps/decode.sh --config conf/decode_dnn.config --nj 10 --cmd "$decode_cmd" \
   exp/tri1/graph_4g data/test120_p_spk exp/tri1/decode_test120_p_spk || exit 1;
 
 
